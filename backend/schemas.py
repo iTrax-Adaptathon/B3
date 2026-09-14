@@ -28,3 +28,6 @@ class BaggageCreate(BaseModel):
     flight_id: str
     current_location: str
     status: str = "IN_TRANSIT"
+
+class FlightDelay(BaseModel):
+    delay_minutes: int
