@@ -12,7 +12,7 @@ from conflict_engine import (
 )
 
 from cascade_engine import (
-    find_affected_flights,
+    find_cascade_impacts,
     find_affected_baggage
 )
 
@@ -233,7 +233,7 @@ def get_flight_impact(
             detail="Flight not found"
         )
 
-    affected_flights = find_affected_flights(
+    affected_flights = find_cascade_impacts(
         db,
         flight
     )
@@ -247,6 +247,44 @@ def get_flight_impact(
         "flight_id": flight.flight_id,
         "status": flight.status,
         "delay_minutes": flight.delay_minutes,
+        "affected_flights": affected_flights,
+        "affected_baggage": affected_baggage,
+        "total_affected_flights": len(affected_flights),
+        "total_affected_bags": len(affected_baggage)
+    }
+
+@router.get("/{flight_id}/cascade")
+def get_cascade_impact(
+    flight_id: str,
+    db: Session = Depends(get_db)
+):
+
+    flight = db.query(Flight).filter(
+        Flight.flight_id == flight_id
+    ).first()
+
+    if not flight:
+        raise HTTPException(
+            status_code=404,
+            detail="Flight not found"
+        )
+
+    affected_flights = find_cascade_impacts(
+        db,
+        flight
+    )
+
+    affected_baggage = find_affected_baggage(
+        db,
+        flight_id
+    )
+
+    return {
+        "root_flight": flight.flight_id,
+        "delay_minutes": flight.delay_minutes,
+        "status": flight.status,
+        "current_gate": flight.gate_id,
+        "current_crew": flight.crew_id,
         "affected_flights": affected_flights,
         "affected_baggage": affected_baggage,
         "total_affected_flights": len(affected_flights),

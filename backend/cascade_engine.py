@@ -2,57 +2,56 @@ from models import Flight, Baggage
 from conflict_engine import times_overlap
 
 
-def find_affected_flights(
-    db,
-    delayed_flight
-):
+def find_cascade_impacts(db, delayed_flight):
 
     affected_flights = []
+
 
     for flight in db.query(Flight).all():
 
         if flight.flight_id == delayed_flight.flight_id:
             continue
 
-        gate_conflict = (
-            flight.gate_id == delayed_flight.gate_id
-            and
-            times_overlap(
-                flight.arrival_time,
-                flight.departure_time,
-                delayed_flight.arrival_time,
-                delayed_flight.departure_time
-            )
-        )
+        gate_risk = False
+        crew_risk = False
 
-        crew_conflict = (
-            flight.crew_id == delayed_flight.crew_id
-            and
-            times_overlap(
-                flight.arrival_time,
-                flight.departure_time,
-                delayed_flight.arrival_time,
-                delayed_flight.departure_time
-            )
-        )
+        # Check same gate
+        if flight.gate_id == delayed_flight.gate_id:
 
-        if gate_conflict or crew_conflict:
+            if times_overlap(
+                delayed_flight.arrival_time,
+                delayed_flight.departure_time,
+                flight.arrival_time,
+                flight.departure_time
+            ):
+                gate_risk = True
+
+        # Check same crew
+        if flight.crew_id == delayed_flight.crew_id:
+
+            if times_overlap(
+                delayed_flight.arrival_time,
+                delayed_flight.departure_time,
+                flight.arrival_time,
+                flight.departure_time
+            ):
+                crew_risk = True
+
+        if gate_risk or crew_risk:
 
             affected_flights.append({
                 "flight_id": flight.flight_id,
                 "gate": flight.gate_id,
                 "crew": flight.crew_id,
-                "gate_conflict": gate_conflict,
-                "crew_conflict": crew_conflict
+                "gate_risk": gate_risk,
+                "crew_risk": crew_risk,
+                "impact": "HIGH"
             })
 
     return affected_flights
 
 
-def find_affected_baggage(
-    db,
-    flight_id
-):
+def find_affected_baggage(db, flight_id):
 
     baggage = db.query(Baggage).filter(
         Baggage.flight_id == flight_id
@@ -61,8 +60,9 @@ def find_affected_baggage(
     return [
         {
             "bag_id": bag.bag_id,
-            "status": bag.status,
-            "location": bag.current_location
+            "flight_id": bag.flight_id,
+            "location": bag.current_location,
+            "status": bag.status
         }
         for bag in baggage
     ]

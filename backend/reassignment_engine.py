@@ -21,9 +21,6 @@ def find_best_gate(
 
         conflict_count = 0
 
-        for other_flight in flight.__class__.query if False else []:
-            pass
-
         from models import Flight
 
         flights = db.query(Flight).filter(
