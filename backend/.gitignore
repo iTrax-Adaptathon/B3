@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+airport.db
+.venv/
+venv/
+.env
