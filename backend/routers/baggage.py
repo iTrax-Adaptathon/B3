@@ -29,6 +29,7 @@ def create_baggage(
     new_baggage = Baggage(
         bag_id=baggage.bag_id,
         flight_id=baggage.flight_id,
+        connecting_flight_id=baggage.connecting_flight_id,
         current_location=baggage.current_location,
         status=baggage.status
     )

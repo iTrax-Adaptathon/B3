@@ -1,41 +1,57 @@
 from models import Flight, Baggage
-from conflict_engine import times_overlap
+from conflict_engine import windows_conflict, overlap_minutes
+from rules import GATE_BUFFER_MIN, CREW_REST_MIN
 
 
 def find_cascade_impacts(db, delayed_flight):
+    """Who would have collided with this flight if nothing was reassigned."""
 
     affected_flights = []
 
-
-    for flight in db.query(Flight).all():
+    for flight in db.query(Flight).filter(Flight.status != "CANCELLED").all():
 
         if flight.flight_id == delayed_flight.flight_id:
             continue
 
         gate_risk = False
         crew_risk = False
+        overlap = 0
 
-        # Check same gate
-        if flight.gate_id == delayed_flight.gate_id:
+        if flight.gate_id and flight.gate_id == delayed_flight.gate_id:
 
-            if times_overlap(
+            if windows_conflict(
                 delayed_flight.arrival_time,
                 delayed_flight.departure_time,
                 flight.arrival_time,
-                flight.departure_time
+                flight.departure_time,
+                GATE_BUFFER_MIN
             ):
                 gate_risk = True
+                overlap = max(overlap, overlap_minutes(
+                    delayed_flight.arrival_time,
+                    delayed_flight.departure_time,
+                    flight.arrival_time,
+                    flight.departure_time,
+                    GATE_BUFFER_MIN
+                ))
 
-        # Check same crew
-        if flight.crew_id == delayed_flight.crew_id:
+        if flight.crew_id and flight.crew_id == delayed_flight.crew_id:
 
-            if times_overlap(
+            if windows_conflict(
                 delayed_flight.arrival_time,
                 delayed_flight.departure_time,
                 flight.arrival_time,
-                flight.departure_time
+                flight.departure_time,
+                CREW_REST_MIN
             ):
                 crew_risk = True
+                overlap = max(overlap, overlap_minutes(
+                    delayed_flight.arrival_time,
+                    delayed_flight.departure_time,
+                    flight.arrival_time,
+                    flight.departure_time,
+                    CREW_REST_MIN
+                ))
 
         if gate_risk or crew_risk:
 
@@ -45,7 +61,8 @@ def find_cascade_impacts(db, delayed_flight):
                 "crew": flight.crew_id,
                 "gate_risk": gate_risk,
                 "crew_risk": crew_risk,
-                "impact": "HIGH"
+                "overlap_minutes": overlap,
+                "impact": "HIGH" if (gate_risk and crew_risk) or overlap >= 30 else "MEDIUM"
             })
 
     return affected_flights
@@ -61,6 +78,7 @@ def find_affected_baggage(db, flight_id):
         {
             "bag_id": bag.bag_id,
             "flight_id": bag.flight_id,
+            "connecting_flight_id": bag.connecting_flight_id,
             "location": bag.current_location,
             "status": bag.status
         }

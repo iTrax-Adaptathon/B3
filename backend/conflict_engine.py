@@ -1,41 +1,73 @@
-from datetime import datetime
+from rules import GATE_BUFFER_MIN, CREW_REST_MIN
 
 
 def time_to_minutes(time_string):
-    time = datetime.strptime(time_string, "%H:%M")
-    return time.hour * 60 + time.minute
+    hours, minutes = time_string.split(":")
+    return int(hours) * 60 + int(minutes)
 
 
-def times_overlap(start1, end1, start2, end2):
+def minutes_to_time(total_minutes):
+    if total_minutes > 23 * 60 + 59:
+        total_minutes = 23 * 60 + 59
+    if total_minutes < 0:
+        total_minutes = 0
 
-    start1 = time_to_minutes(start1)
-    end1 = time_to_minutes(end1)
+    return f"{total_minutes // 60:02d}:{total_minutes % 60:02d}"
 
-    start2 = time_to_minutes(start2)
-    end2 = time_to_minutes(end2)
+
+def windows_conflict(arrival1, departure1, arrival2, departure2, buffer_minutes=0):
+    """Windows conflict when each one, extended by the buffer after departure,
+    overlaps the other."""
+
+    start1 = time_to_minutes(arrival1)
+    end1 = time_to_minutes(departure1) + buffer_minutes
+
+    start2 = time_to_minutes(arrival2)
+    end2 = time_to_minutes(departure2) + buffer_minutes
 
     return start1 < end2 and start2 < end1
+
+
+def overlap_minutes(arrival1, departure1, arrival2, departure2, buffer_minutes=0):
+
+    start1 = time_to_minutes(arrival1)
+    end1 = time_to_minutes(departure1) + buffer_minutes
+
+    start2 = time_to_minutes(arrival2)
+    end2 = time_to_minutes(departure2) + buffer_minutes
+
+    return max(0, min(end1, end2) - max(start1, start2))
 
 
 def check_gate_conflict(
     db,
     gate_id,
     arrival_time,
-    departure_time
+    departure_time,
+    exclude_flight_id=None,
+    buffer_minutes=GATE_BUFFER_MIN
 ):
     from models import Flight
 
-    flights = db.query(Flight).filter(
-        Flight.gate_id == gate_id
-    ).all()
+    if not gate_id:
+        return None
 
-    for flight in flights:
+    query = db.query(Flight).filter(
+        Flight.gate_id == gate_id,
+        Flight.status != "CANCELLED"
+    )
 
-        if times_overlap(
+    if exclude_flight_id is not None:
+        query = query.filter(Flight.flight_id != exclude_flight_id)
+
+    for flight in query.all():
+
+        if windows_conflict(
             arrival_time,
             departure_time,
             flight.arrival_time,
-            flight.departure_time
+            flight.departure_time,
+            buffer_minutes
         ):
             return flight
 
@@ -46,33 +78,36 @@ def check_crew_conflict(
     db,
     crew_id,
     arrival_time,
-    departure_time
+    departure_time,
+    exclude_flight_id=None,
+    buffer_minutes=CREW_REST_MIN
 ):
     from models import Flight
 
-    flights = db.query(Flight).filter(
-        Flight.crew_id == crew_id
-    ).all()
+    if not crew_id:
+        return None
 
-    for flight in flights:
+    query = db.query(Flight).filter(
+        Flight.crew_id == crew_id,
+        Flight.status != "CANCELLED"
+    )
 
-        if times_overlap(
+    if exclude_flight_id is not None:
+        query = query.filter(Flight.flight_id != exclude_flight_id)
+
+    for flight in query.all():
+
+        if windows_conflict(
             arrival_time,
             departure_time,
             flight.arrival_time,
-            flight.departure_time
+            flight.departure_time,
+            buffer_minutes
         ):
             return flight
 
     return None
 
+
 def add_delay(time_string, delay_minutes):
-
-    total_minutes = time_to_minutes(time_string)
-
-    total_minutes += delay_minutes
-
-    hours = total_minutes // 60
-    minutes = total_minutes % 60
-
-    return f"{hours:02d}:{minutes:02d}"
+    return minutes_to_time(time_to_minutes(time_string) + delay_minutes)

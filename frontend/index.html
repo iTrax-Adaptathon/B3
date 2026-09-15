@@ -1,830 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Autonomous Airport Operations</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #eef2f7;
-            color: #172033;
-        }
-
-        /* SIDEBAR */
-
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 220px;
-            height: 100vh;
-            background: #101a35;
-            color: white;
-            padding: 25px 18px;
-        }
-
-        .logo {
-            font-size: 21px;
-            font-weight: bold;
-            margin-bottom: 40px;
-        }
-
-        .logo span {
-            font-size: 28px;
-        }
-
-        .menu {
-            padding: 14px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .menu.active {
-            background: #26365f;
-        }
-
-        /* MAIN */
-
-        .main {
-            margin-left: 220px;
-            padding: 25px;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .topbar h1 {
-            margin: 0;
-            font-size: 28px;
-        }
-
-        .online {
-            background: #dcfce7;
-            color: #15803d;
-            padding: 9px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        /* CARDS */
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-        }
-
-        .card-title {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .card-number {
-            font-size: 30px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-
-        /* GRID */
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-
-        .panel {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-        }
-
-        .panel h2 {
-            margin-top: 0;
-            font-size: 19px;
-        }
-
-        /* TABLE */
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            background: #f1f5f9;
-            padding: 12px;
-            font-size: 13px;
-        }
-
-        td {
-            padding: 13px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-        }
-
-        .status {
-            padding: 5px 9px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .delayed {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .on-time {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        /* ALERTS */
-
-        .alert {
-            padding: 13px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            background: #fff7ed;
-            border-left: 4px solid #f97316;
-        }
-
-        .alert.high {
-            background: #fef2f2;
-            border-left-color: #ef4444;
-        }
-
-        .alert-title {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .alert-message {
-            font-size: 13px;
-            color: #475569;
-        }
-
-        /* RESOURCE */
-
-        .resource {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .available {
-            color: #15803d;
-            font-weight: bold;
-        }
-
-        /* IMPACT */
-
-        .impact-box {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .impact-number {
-            font-size: 25px;
-            font-weight: bold;
-        }
-
-        /* RESPONSIVE */
-
-        @media (max-width: 1000px) {
-
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 700px) {
-
-            .sidebar {
-                display: none;
-            }
-
-            .main {
-                margin-left: 0;
-            }
-
-            .cards {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AeroMind &mdash; Airport operations, handled automatically</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='19' font-size='20'>A</text></svg>">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="cinema.css">
 </head>
-
-
 <body>
 
-    <!-- SIDEBAR -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 20l8-4 8 4-8-18Z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 2"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a.5.5 0 0 0-.5.8L8 11l-2 2H3.5l-.7 1.4 3.6 1.2 1.2 3.6L9 18.5V16l2-2 3.9 3.7a.5.5 0 0 0 .9-.5Z"/></symbol>
+    <symbol id="i-gate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7M3 21h18"/></symbol>
+    <symbol id="i-crew" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.2a3.2 3.2 0 0 1 0 5.8M18 20a6.4 6.4 0 0 0-2-4.6"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V7M3 12h18"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2A2.8 2.8 0 0 1 14.7 10c0 1.9-2.7 2.2-2.7 4M12 17.2h.01"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 4 6v6c0 5 3.4 8.6 8 9.5 4.6-.9 8-4.5 8-9.5V6l-8-3.5Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.6 17.4A1.9 1.9 0 0 0 4.3 20h15.4a1.9 1.9 0 0 0 1.7-2.6L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/><path d="M12 9v4.5M12 17h.01"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 4.5v15l13-7.5-13-7.5Z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v5h5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M4.4 5.6 3 13v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5l-1.4-7.4A2 2 0 0 0 17.6 4H6.4a2 2 0 0 0-2 1.6Z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6M7 19H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 15h10v6H7z"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 9H3v6h3.5L11 19Z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+  </defs>
+</svg>
 
-    <aside class="sidebar">
-
-        <div class="logo">
-            <span>✈️</span><br>
-            Airport Ops
-        </div>
-
-        <div class="menu active">📊 Dashboard</div>
-        <div class="menu">✈️ Flights</div>
-        <div class="menu">🚪 Gates</div>
-        <div class="menu">👨‍✈️ Crew</div>
-        <div class="menu">🧳 Baggage</div>
-        <div class="menu">🚨 Alerts</div>
-
-    </aside>
-
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-        <div class="topbar">
-
-            <div>
-                <h1>Autonomous Airport Operations</h1>
-                <p>Real-time operational control center</p>
-            </div>
-
-            <div class="online">
-                ● SYSTEM ONLINE
-            </div>
-
-        </div>
-
-
-        <!-- SUMMARY CARDS -->
-
-        <div class="cards">
-
-            <div class="card">
-                <div class="card-title">TOTAL FLIGHTS</div>
-                <div class="card-number" id="flightCount">0</div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">GATES</div>
-                <div class="card-number" id="gateCount">0</div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">CREW</div>
-                <div class="card-number" id="crewCount">0</div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">BAGGAGE</div>
-                <div class="card-number" id="baggageCount">0</div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">ACTIVE ALERTS</div>
-                <div class="card-number" id="alertCount">0</div>
-            </div>
-
-        </div>
-
-
-        <div class="dashboard-grid">
-
-
-            <!-- LEFT SIDE -->
-
-            <div>
-
-                <!-- FLIGHTS -->
-
-                <div class="panel">
-
-                    <h2>✈️ Live Flight Operations</h2>
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>Flight</th>
-                                <th>Arrival</th>
-                                <th>Departure</th>
-                                <th>Gate</th>
-                                <th>Crew</th>
-                                <th>Status</th>
-                                <th>Delay</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="flightTable"></tbody>
-
-                    </table>
-
-                </div>
-
-
-                <!-- IMPACT -->
-
-                <div class="panel">
-
-                    <h2>🔄 Operational Impact</h2>
-
-                    <div class="impact-box">
-
-                        <p>
-                            Root Flight:
-                            <strong id="rootFlight">-</strong>
-                        </p>
-
-                        <p>
-                            Current Gate:
-                            <strong id="currentGate">-</strong>
-                        </p>
-
-                        <p>
-                            Current Crew:
-                            <strong id="currentCrew">-</strong>
-                        </p>
-
-                        <p>
-                            Delay:
-                            <strong id="impactDelay">0 min</strong>
-                        </p>
-
-                        <p>
-                            Affected Flights:
-                            <span class="impact-number" id="affectedFlights">0</span>
-                        </p>
-
-                        <p>
-                            Affected Baggage:
-                            <span class="impact-number" id="affectedBags">0</span>
-                        </p>
-
-                    </div>
-
-                </div>
-                <!-- AUTONOMOUS DECISION -->
-
-<div class="panel">
-
-    <h2>🤖 Autonomous Decision</h2>
-
-    <div class="impact-box">
-
-        <p>
-            <strong>Decision Engine Status</strong>
-        </p>
-
-        <p id="decisionStatus">
-            Analyzing operations...
-        </p>
-
-        <hr>
-
-        <p>
-            ✈️ Flight:
-            <strong id="decisionFlight">-</strong>
-        </p>
-
-        <p>
-            ⏱️ Delay Detected:
-            <strong id="decisionDelay">-</strong>
-        </p>
-
-        <p>
-            🚪 Gate Decision:
-            <strong id="gateDecision">-</strong>
-        </p>
-
-        <p>
-            👨‍✈️ Crew Decision:
-            <strong id="crewDecision">-</strong>
-        </p>
-
-        <p>
-            🧳 Baggage:
-            <strong id="baggageDecision">-</strong>
-        </p>
-
-    </div>
-
+<div id="splash">
+  <svg id="splash-arcs" viewBox="0 0 1280 800" preserveAspectRatio="xMidYMid slice"></svg>
+  <div class="splash-in">
+    <svg id="splash-mark" viewBox="0 0 64 64">
+      <path class="glow" d="M32 6 14 56l18-9 18 9L32 6Z"/>
+      <path d="M32 24v22"/>
+      <circle cx="32" cy="32" r="27"/>
+    </svg>
+    <div class="splash-name">AeroMind</div>
+    <div class="splash-rule"></div>
+    <div class="splash-tag">Airport operations, handled automatically</div>
+    <button class="btn primary" id="splash-enter">Enter the control room</button>
+  </div>
+  <div class="splash-skip">Click anywhere or press Esc to skip</div>
 </div>
+<div id="progress"></div>
 
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg><use href="#i-logo"/></svg></div>
+      <div>
+        <div class="brand-name">AeroMind</div>
+        <div class="brand-sub">Airport operations, handled automatically</div>
+      </div>
+    </div>
+    <nav id="nav" aria-label="Main">
+      <button class="nav-item active" data-view="home"><svg><use href="#i-home"/></svg>Home</button>
+      <button class="nav-item" data-view="delay"><svg><use href="#i-clock"/></svg>Delay a flight</button>
+      <div class="nav-cap">Today</div>
+      <button class="nav-item" data-view="flights"><svg><use href="#i-plane"/></svg>Flights<span class="nav-badge" id="nb-flights">-</span></button>
+      <button class="nav-item" data-view="gates"><svg><use href="#i-gate"/></svg>Gates<span class="nav-badge" id="nb-gates">-</span></button>
+      <button class="nav-item" data-view="crew"><svg><use href="#i-crew"/></svg>Crew<span class="nav-badge" id="nb-crew">-</span></button>
+      <button class="nav-item" data-view="baggage"><svg><use href="#i-bag"/></svg>Baggage<span class="nav-badge" id="nb-bags">-</span></button>
+      <div class="nav-cap">Record</div>
+      <button class="nav-item" data-view="history"><svg><use href="#i-log"/></svg>Decision history<span class="nav-badge" id="nb-dec">-</span></button>
+      <button class="nav-item" data-view="report"><svg><use href="#i-doc"/></svg>Day report</button>
+      <button class="nav-item" data-view="how"><svg><use href="#i-help"/></svg>How it works</button>
+    </nav>
+    <div class="side-foot">
+      <div><b>The promise</b></div>
+      <div>No two flights ever share a gate or a crew. Every change is checked and explained.</div>
+      <div id="last-sync" style="margin-top:6px">Connecting&hellip;</div>
+    </div>
+  </aside>
+
+  <div id="main">
+    <header id="topbar">
+      <button id="menu" aria-label="Show menu"><svg><use href="#i-menu"/></svg></button>
+      <div>
+        <div class="tb-title" id="view-title">Home</div>
+        <div class="tb-sub" id="view-sub">Today at a glance</div>
+      </div>
+      <div class="tb-right">
+        <span class="pill" id="integrity-badge" title="No two flights share a gate or a crew">
+          <svg><use href="#i-shield"/></svg><span id="integrity-text">Checking&hellip;</span>
+        </span>
+        <span class="pill"><span class="dot" id="live-dot"></span><span class="lbl">Live</span></span>
+        <button class="pill" id="snd" title="Sound"><svg><use href="#i-sound"/></svg><span class="lbl" id="snd-l">Sound off</span></button>
+        <span class="pill"><span id="clock">--:--:--</span></span>
+      </div>
+    </header>
+
+    <div id="offline"><svg><use href="#i-alert"/></svg><span>Can't reach the operations server right now. Retrying every few seconds &mdash; the last known information is shown below.</span></div>
+
+    <main id="content">
+
+      <!-- HOME -->
+      <section class="view active" id="v-home">
+        <div class="headline" id="headline"></div>
+        <div class="kpis" id="kpis"></div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row">
+            <div><div class="sec-title">Live Airport</div>
+              <div class="sec-sub">A top-down view of both terminals. Aircraft taxi in and out as the day moves.</div></div>
+          </div></div>
+          <div class="map-card">
+            <div class="map-bar">
+              <div><div class="vclock-l">Airport time</div><div class="vclock" id="vclock">09:00</div></div>
+              <div class="map-live"><span class="dot"></span><span id="map-note">Stands in use right now</span></div>
+              <div class="map-ctl">
+                <div class="spd"><button data-spd="1">1x</button><button data-spd="2">2x</button><button data-spd="4">4x</button></div>
+                <button class="btn sm" id="mp-play"><svg><use href="#i-play"/></svg>Play</button>
+                <button class="btn sm ghost" id="mp-stop"><svg><use href="#i-stop"/></svg>Stop</button>
+              </div>
             </div>
-
-
-            <!-- RIGHT SIDE -->
-
-            <div>
-
-                <!-- ALERTS -->
-
-                <div class="panel">
-
-                    <h2>🚨 Live Alerts</h2>
-
-                    <div id="alertsContainer">
-                        Loading alerts...
-                    </div>
-
-                </div>
-
-
-                <!-- RESOURCES -->
-
-                <div class="panel">
-
-                    <h2>📍 Resource Status</h2>
-
-                    <div class="resource">
-                        <span>Gates</span>
-                        <span class="available" id="gateStatus">-</span>
-                    </div>
-
-                    <div class="resource">
-                        <span>Crew</span>
-                        <span class="available" id="crewStatus">-</span>
-                    </div>
-
-                    <div class="resource">
-                        <span>Baggage</span>
-                        <span class="available" id="bagStatus">-</span>
-                    </div>
-
-                </div>
-
+            <div class="map-wrap"><svg id="map" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet"></svg></div>
+            <div class="scrub">
+              <span class="lab">06:00</span>
+              <input type="range" id="scrubber" min="360" max="1320" step="1" value="540" aria-label="Airport time">
+              <span class="lab">22:00</span>
             </div>
-
+          </div>
         </div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row">
+            <div><div class="sec-title">Live Flight Operations</div>
+              <div class="sec-sub">Every flight we are tracking today, with its planned time and its time right now.</div></div>
+            <div class="right" id="ops-note"></div>
+          </div></div>
+          <div class="panel"><div id="ops-tw"></div></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row">
+            <div><div class="sec-title">Gate Timeline</div>
+              <div class="sec-sub">Which aircraft is at which gate, hour by hour. Gold blocks are running late.</div></div>
+            <div class="right" id="timeline-note"></div>
+          </div></div>
+          <div class="panel">
+            <div class="gantt-wrap" id="gantt-wrap"></div>
+            <div class="gt-legend">
+              <span><i style="background:rgba(243,237,224,.05);border-color:rgba(243,237,224,.3)"></i>On time</span>
+              <span><i style="background:rgba(212,175,55,.22);border-color:rgba(212,175,55,.6)"></i>Running late</span>
+              <span><i style="background:rgba(90,83,72,.2);border-color:#433c33"></i>Cancelled</span>
+              <span><i style="background:transparent;border-color:var(--gold);box-shadow:0 0 6px rgba(212,175,55,.5)"></i>Just moved by AeroMind</span>
+              <span><i style="background:repeating-linear-gradient(45deg,rgba(140,122,58,.4) 0 3px,transparent 3px 6px);border-color:rgba(140,122,58,.35)"></i>Turnaround gap</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid row-2 sec">
+          <div class="panel">
+            <div class="panel-head">
+              <div><div class="panel-title">Autonomous Decisions</div>
+                <div class="panel-sub">What AeroMind changed, in plain English.</div></div>
+              <div class="panel-note" id="feed-note"></div>
+            </div>
+            <div class="panel-body flush"><div class="feed" id="feed"></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <div><div class="panel-title">Live Alerts</div>
+                <div class="panel-sub">Things worth knowing about right now.</div></div>
+              <div class="panel-note" id="alerts-note"></div>
+            </div>
+            <div class="panel-body flush"><div class="alist" id="alerts"></div></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row"><div>
+            <div class="sec-title">Resource Status</div>
+            <div class="sec-sub">How much room we have left today.</div></div></div></div>
+          <div class="panel"><div class="res3" id="resources"></div></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row"><div>
+            <div class="sec-title">Operational Impact</div>
+            <div class="sec-sub">The most recent change and everything it touched.</div></div></div></div>
+          <div class="panel"><div class="panel-body" id="impact"></div></div>
+        </div>
+      </section>
+
+      <!-- DELAY A FLIGHT -->
+      <section class="view" id="v-delay">
+        <div class="grid" style="grid-template-columns:376px 1fr;align-items:start" id="delay-grid">
+          <div class="steps">
+            <div class="step">
+              <div class="step-h"><div class="step-n">1</div>
+                <div><div class="step-q">Which flight?</div>
+                  <div class="step-hint">Pick the flight that is running late.</div></div></div>
+              <select class="inp mono" id="sim-flight" style="width:100%"></select>
+            </div>
+            <div class="step">
+              <div class="step-h"><div class="step-n">2</div>
+                <div><div class="step-q">How late?</div>
+                  <div class="step-hint">Choose the delay in minutes.</div></div></div>
+              <div class="quick" id="sim-quick"></div>
+              <div style="margin-top:11px;display:flex;align-items:center;gap:9px">
+                <input class="inp mono" id="sim-min" type="number" min="1" max="600" step="5" value="30" style="width:96px">
+                <span class="muted" style="font-size:12px">minutes late</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-h"><div class="step-n">3</div>
+                <div><div class="step-q">See it, then do it</div>
+                  <div class="step-hint">Nothing changes until you apply.</div></div></div>
+              <div class="go-row">
+                <button class="btn" id="btn-preview"><svg><use href="#i-eye"/></svg>See what would happen</button>
+                <button class="btn primary" id="btn-apply"><svg><use href="#i-play"/></svg>Apply this plan</button>
+              </div>
+              <div class="go-note">A preview works out the whole knock-on effect and then throws it away, so you can look before you commit.</div>
+            </div>
+          </div>
+          <div>
+            <div id="result-wrap" style="margin-bottom:22px"></div>
+
+            <div class="sec" style="margin-bottom:18px">
+              <div class="sec-head"><div class="row"><div>
+                <div class="sec-title">Try a ready-made scenario</div>
+                <div class="sec-sub">Real situations an airport faces every day. One click each.</div></div>
+                <div class="right" id="presets-note"></div></div></div>
+              <div class="presets" id="presets"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-body">
+                <div style="display:flex;gap:11px;flex-wrap:wrap;align-items:center">
+                  <button class="btn" id="btn-reset"><svg><use href="#i-reset"/></svg>Reset demo</button>
+                  <span class="muted" style="font-size:12px;flex:1;min-width:190px">Puts the schedule back to its clean starting state.</span>
+                </div>
+                <div style="display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-top:12px">
+                  <button class="btn" id="btn-chaos"><svg><use href="#i-bolt"/></svg>Simulate a chaotic hour</button>
+                  <span class="muted" style="font-size:12px;flex:1;min-width:190px">Throws three random delays at the airport at once and lets AeroMind sort it out.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FLIGHTS -->
+      <section class="view" id="v-flights">
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search"><svg><use href="#i-search"/></svg><input class="inp" id="f-search" placeholder="Search a flight, airline, route or gate"></div>
+            <div class="seg" id="f-filter">
+              <button class="on" data-f="ALL">All</button>
+              <button data-f="DELAYED">Delayed</button>
+              <button data-f="ON_TIME">On time</button>
+              <button data-f="CANCELLED">Cancelled</button>
+            </div>
+            <div class="tcount" id="f-count"></div>
+          </div>
+          <div class="tw tbl-scroll" id="flights-tw"></div>
+        </div>
+      </section>
+
+      <!-- GATES -->
+      <section class="view" id="v-gates">
+        <div id="gates"></div>
+      </section>
+
+      <!-- CREW -->
+      <section class="view" id="v-crew">
+        <div id="crew"></div>
+      </section>
+
+      <!-- BAGGAGE -->
+      <section class="view" id="v-baggage">
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search"><svg><use href="#i-search"/></svg><input class="inp" id="b-search" placeholder="Search a bag, flight or location"></div>
+            <div class="seg" id="b-filter">
+              <button class="on" data-f="ALL">All</button>
+              <button data-f="RISK">At risk</button>
+              <button data-f="CONN">Connecting</button>
+            </div>
+            <div class="tcount" id="b-count"></div>
+          </div>
+          <div class="tw tbl-scroll" id="baggage-tw"></div>
+        </div>
+      </section>
+
+      <!-- DECISION HISTORY -->
+      <section class="view" id="v-history">
+        <div class="panel">
+          <div class="toolbar">
+            <select class="inp" id="d-type"><option value="">All kinds of change</option></select>
+            <select class="inp mono" id="d-flight"><option value="">All flights</option></select>
+            <button class="btn sm ghost" id="d-clear">Clear</button>
+            <div class="tcount" id="d-count"></div>
+          </div>
+          <div class="tw tbl-scroll" id="decisions-tw"></div>
+        </div>
+      </section>
+
+      <!-- DAY REPORT -->
+      <section class="view" id="v-report">
+        <div style="display:flex;gap:10px;margin-bottom:15px" class="rep-actions">
+          <button class="btn primary" id="rep-print"><svg><use href="#i-print"/></svg>Print / Save as PDF</button>
+        </div>
+        <div id="report"></div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section class="view" id="v-how">
+        <div class="headline" style="margin-bottom:22px">
+          <div class="hl-main">
+            <div class="hl-eyebrow">How it works</div>
+            <div class="hl-text">One flight is late. AeroMind works out <b>everything else that breaks</b> &mdash; and fixes it before it spreads.</div>
+          </div>
+        </div>
+
+        <div class="how">
+          <div class="how-step"><div class="how-n">1</div>
+            <div class="how-t">A delay comes in</div>
+            <div class="how-d">An aircraft is going to land forty minutes late. Its new arrival and departure times are worked out straight away.</div></div>
+          <div class="how-step"><div class="how-n">2</div>
+            <div class="how-t">AeroMind finds every conflict</div>
+            <div class="how-d">It checks the gate the aircraft was meant to use, whether the crew has had enough rest, and whether any bag on board can still make its connecting flight.</div></div>
+          <div class="how-step"><div class="how-n">3</div>
+            <div class="how-t">It fixes them automatically</div>
+            <div class="how-d">A new gate, a new crew, bags sent to the right belt or re-booked onto a later flight. If nothing is free, it moves a lower-priority flight out of the way and then solves that flight's problems too.</div></div>
+          <div class="how-step"><div class="how-n">4</div>
+            <div class="how-t">It checks its own work</div>
+            <div class="how-d">Before anything is saved, AeroMind proves no two flights share a gate or a crew. If that promise would break, the whole plan is thrown away. Every decision is written down in plain English.</div></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row"><div>
+            <div class="sec-title">The rules it works to</div>
+            <div class="sec-sub">Fixed operating limits that every plan has to respect.</div></div></div></div>
+          <div class="panel"><div class="panel-body"><div class="rules">
+            <div class="rule">Two flights at the same gate need a gap between them<b>15 minutes</b></div>
+            <div class="rule">A crew needs rest between two flights<b>20 minutes</b></div>
+            <div class="rule">A crew sent to the other terminal needs travel time<b>30 minutes</b></div>
+            <div class="rule">A bag needs this long to make its connection<b>30 minutes</b></div>
+            <div class="rule">How far a knock-on change is allowed to spread<b>3 flights deep</b></div>
+          </div></div></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><div class="row"><div>
+            <div class="sec-title">Where this came from</div>
+            <div class="sec-sub">What we kept, and what we added.</div></div></div></div>
+          <div class="panel"><div class="panel-body"><div class="prose">
+            <p>The original operations dashboard is all still here: <b>Live Flight Operations</b>, <b>Operational Impact</b>, the <b>Autonomous Decision</b> feed, <b>Live Alerts</b> and <b>Resource Status</b> &mdash; along with the engines behind them for spotting conflicts, tracing knock-on impact and reassigning resources.</p>
+            <p>AeroMind extends that foundation in five ways. It respects real <b>turnaround and rest gaps</b> instead of just comparing times. It resolves <b>knock-on changes several flights deep</b>, moving a lower-priority flight when nothing else is free. It lets you <b>preview a plan</b> before committing to it. It <b>re-books baggage</b> that would otherwise miss a connection. And it <b>guarantees</b>, after every single change, that no two flights share a gate or a crew &mdash; rolling the whole plan back if that promise cannot be kept.</p>
+          </div></div></div>
+        </div>
+      </section>
 
     </main>
-
-
-    <script>
-
-        const API = "http://127.0.0.1:8000";
-
-
-        async function loadDashboard() {
-
-            try {
-
-                const response = await fetch(
-                    API + "/dashboard/"
-                );
-
-                const data = await response.json();
-
-
-                // COUNTS
-
-                document.getElementById("flightCount").textContent =
-                    data.flights.length;
-
-                document.getElementById("gateCount").textContent =
-                    data.gates.length;
-
-                document.getElementById("crewCount").textContent =
-                    data.crew.length;
-
-                document.getElementById("baggageCount").textContent =
-                    data.baggage.length;
-
-
-                // RESOURCE STATUS
-
-                document.getElementById("gateStatus").textContent =
-                    data.gates.filter(g => g.status === "AVAILABLE").length
-                    + " Available";
-
-                document.getElementById("crewStatus").textContent =
-                    data.crew.filter(c => c.status === "AVAILABLE").length
-                    + " Available";
-
-                document.getElementById("bagStatus").textContent =
-                    data.baggage.filter(b => b.status === "IN_TRANSIT").length
-                    + " In Transit";
-
-
-                // FLIGHT TABLE
-
-                const table =
-                    document.getElementById("flightTable");
-
-                table.innerHTML = "";
-
-
-                data.flights.forEach(flight => {
-
-                    const row =
-                        document.createElement("tr");
-
-                    const statusClass =
-                        flight.status === "DELAYED"
-                            ? "delayed"
-                            : "on-time";
-
-
-                    row.innerHTML = `
-
-                        <td><strong>${flight.flight_id}</strong></td>
-
-                        <td>${flight.arrival_time}</td>
-
-                        <td>${flight.departure_time}</td>
-
-                        <td>${flight.gate}</td>
-
-                        <td>${flight.crew}</td>
-
-                        <td>
-                            <span class="status ${statusClass}">
-                                ${flight.status}
-                            </span>
-                        </td>
-
-                        <td>
-                            ${flight.delay_minutes} min
-                        </td>
-
-                    `;
-
-                    table.appendChild(row);
-
-                });
-
-
-            } catch (error) {
-
-                console.error(
-                    "Dashboard error:",
-                    error
-                );
-
-            }
-
-        }
-
-
-        async function loadAlerts() {
-
-            try {
-
-                const response =
-                    await fetch(API + "/alerts/");
-
-                const data =
-                    await response.json();
-
-
-                document.getElementById("alertCount")
-                    .textContent = data.total_alerts;
-
-
-                const container =
-                    document.getElementById(
-                        "alertsContainer"
-                    );
-
-                container.innerHTML = "";
-
-
-                if (data.alerts.length === 0) {
-
-                    container.innerHTML =
-                        "<p>No active alerts 🎉</p>";
-
-                    return;
-
-                }
-
-
-                data.alerts.forEach(alert => {
-
-                    const div =
-                        document.createElement("div");
-
-                    div.className =
-                        "alert " +
-                        (alert.severity === "HIGH"
-                            ? "high"
-                            : "");
-
-
-                    div.innerHTML = `
-
-                        <div class="alert-title">
-                            ${alert.severity} — ${alert.type}
-                        </div>
-
-                        <div class="alert-message">
-                            ${alert.message}
-                        </div>
-
-                    `;
-
-                    container.appendChild(div);
-
-                });
-
-
-            } catch (error) {
-
-                console.error(
-                    "Alert error:",
-                    error
-                );
-
-            }
-
-        }
-
-
-        async function loadImpact() {
-
-            try {
-
-                const response =
-                    await fetch(
-                        API + "/flights/F101/cascade"
-                    );
-
-                const data =
-                    await response.json();
-
-
-                document.getElementById("rootFlight")
-                    .textContent = data.root_flight;
-
-                document.getElementById("currentGate")
-                    .textContent = data.current_gate;
-
-                document.getElementById("currentCrew")
-                    .textContent = data.current_crew;
-
-                document.getElementById("impactDelay")
-                    .textContent =
-                    data.delay_minutes + " min";
-
-                document.getElementById("affectedFlights")
-                    .textContent =
-                    data.total_affected_flights;
-
-                document.getElementById("affectedBags")
-                    .textContent =
-                    data.total_affected_bags;
-
-
-            } catch (error) {
-
-                console.error(
-                    "Impact error:",
-                    error
-                );
-
-            }
-
-        }
-        async function loadDecision() {
-
-    try {
-
-        const response =
-            await fetch(API + "/flights/F101/cascade");
-
-        const data =
-            await response.json();
-
-
-        document.getElementById("decisionFlight")
-            .textContent = data.root_flight;
-
-
-        document.getElementById("decisionDelay")
-            .textContent =
-            data.delay_minutes + " minutes";
-
-
-        if (data.delay_minutes > 0) {
-
-            document.getElementById("decisionStatus")
-                .textContent =
-                "✓ Delay detected — autonomous analysis completed";
-
-        } else {
-
-            document.getElementById("decisionStatus")
-                .textContent =
-                "✓ No delay detected";
-
-        }
-
-
-        if (data.total_affected_flights > 0) {
-
-            document.getElementById("gateDecision")
-                .textContent =
-                "Reassignment required";
-
-            document.getElementById("crewDecision")
-                .textContent =
-                "Reassignment required";
-
-        } else {
-
-            document.getElementById("gateDecision")
-                .textContent =
-                "✓ No conflict detected";
-
-            document.getElementById("crewDecision")
-                .textContent =
-                "✓ No conflict detected";
-
-        }
-
-
-        if (data.total_affected_bags > 0) {
-
-            document.getElementById("baggageDecision")
-                .textContent =
-                data.total_affected_bags +
-                " bag(s) routing updated";
-
-        } else {
-
-            document.getElementById("baggageDecision")
-                .textContent =
-                "No baggage impact";
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Decision error:",
-            error
-        );
-
-    }
-
-}
-
-
-        // LOAD DATA
-
-        loadDashboard();
-        loadAlerts();
-        loadImpact();
-        loadDecision();
-
-
-        // AUTO REFRESH EVERY 10 SECONDS
-
-        setInterval(() => {
-
-            loadDashboard();
-            loadAlerts();
-            loadImpact();
-            loadDecision();
-
-        }, 10000);
-
-    </script>
-
+    <div id="ticker">
+      <div class="tk-tag"><span class="dot"></span>Live decisions</div>
+      <div class="tk-win" id="tk-win"></div>
+    </div>
+  </div>
+</div>
+
+<div id="narr">
+  <div class="nr-t"><span class="tm" id="nr-tag">--:--</span><span>AeroMind</span></div>
+  <div class="nr-x" id="nr-x"></div>
+</div>
+
+<div id="summary"><canvas id="sumcanvas"></canvas><div class="sum-card" id="sum-body"></div></div>
+
+<div id="palette"><div class="pal">
+  <input id="pal-in" placeholder="Type a command, or &quot;delay F101 30&quot;" autocomplete="off" spellcheck="false">
+  <div class="pal-list" id="pal-list"></div>
+  <div class="pal-foot">Enter to run &middot; Esc to close</div>
+</div></div>
+
+<div id="keys"><div class="keys-c">
+  <div style="font-family:var(--serif);font-size:19px;margin-bottom:14px;letter-spacing:.5px">Keyboard shortcuts</div>
+  <div class="keys-r">Command palette<kbd>Ctrl K</kbd></div>
+  <div class="keys-r">This list<kbd>?</kbd></div>
+  <div class="keys-r">Close anything<kbd>Esc</kbd></div>
+  <div class="keys-r">Open a flight<kbd>Enter</kbd></div>
+  <div class="keys-r">Move through the palette<kbd>&uarr; &darr;</kbd></div>
+</div></div>
+
+<div id="scrim"></div>
+<aside id="drawer" role="dialog" aria-modal="true" aria-label="Flight detail">
+  <div class="dw-h">
+    <div><div class="dw-id" id="dw-id">&mdash;</div><div class="card-sub" id="dw-sub">&mdash;</div></div>
+    <button class="dw-x" id="dw-close" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+  </div>
+  <div class="dw-b" id="dw-body"></div>
+  <div class="dw-f">
+    <button class="btn sm" data-dl="15">Delay 15 min</button>
+    <button class="btn sm" data-dl="30">Delay 30 min</button>
+    <button class="btn sm" data-dl="60">Delay 60 min</button>
+    <button class="btn sm danger" id="dw-cancel">Cancel flight</button>
+  </div>
+</aside>
+<div id="tip"></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script src="app.js"></script>
+<script src="cinema.js"></script>
 </body>
-
 </html>
